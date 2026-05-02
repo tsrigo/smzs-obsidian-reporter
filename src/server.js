@@ -15,6 +15,32 @@ const RAW_DIR = path.join(REPORTS_DIR, 'Raw');
 const INBOX_PATH = path.join(VAULT_ROOT, 'Knowledge', 'Inbox.md');
 const REPORTS_INDEX_PATH = path.join(REPORTS_DIR, 'README.md');
 const KNOWLEDGE_SOURCES_INDEX_PATH = path.join(VAULT_ROOT, 'Knowledge', 'Sources', 'README.md');
+const BOOKMARKLET_PATH = path.join(__dirname, 'bookmarklet.js');
+const BOOKMARKLET_INSTALLER = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SMZS Obsidian Reporter Bookmarklet</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 48px auto; padding: 0 20px; line-height: 1.6; }
+    a.bookmarklet { display: inline-block; padding: 10px 14px; border: 1px solid #333; border-radius: 6px; color: #111; text-decoration: none; }
+    code { background: #f3f3f3; padding: 2px 4px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Save to Obsidian</h1>
+  <p>Drag this button to your bookmarks bar:</p>
+  <p><a class="bookmarklet" href="javascript:(()=>{const s=document.createElement('script');s.src='http://127.0.0.1:${PORT}/bookmarklet.js?t='+Date.now();document.body.appendChild(s)})()">Save to Obsidian</a></p>
+  <h2>Use</h2>
+  <ol>
+    <li>Keep this reporter running.</li>
+    <li>Open a social media post page.</li>
+    <li>Click the <code>Save to Obsidian</code> bookmark.</li>
+  </ol>
+  <p>The bookmarklet sends the current page title, readable text, and images to <code>/reporting</code>.</p>
+</body>
+</html>`;
 
 function pad(value) {
   return String(value).padStart(2, '0');
@@ -293,6 +319,16 @@ function sendJson(res, statusCode, body) {
   res.end(JSON.stringify(body));
 }
 
+function sendText(res, statusCode, body, contentType) {
+  res.writeHead(statusCode, {
+    'Content-Type': contentType,
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, X-Report-Token',
+  });
+  res.end(body);
+}
+
 function readBody(req, callback) {
   let size = 0;
   const chunks = [];
@@ -347,6 +383,14 @@ const server = http.createServer((req, res) => {
       service: 'smzs-obsidian-reporter',
       vaultPath: VAULT_ROOT,
     });
+  }
+
+  if (req.url === '/bookmarklet') {
+    return sendText(res, 200, BOOKMARKLET_INSTALLER, 'text/html; charset=utf-8');
+  }
+
+  if (req.url && req.url.startsWith('/bookmarklet.js')) {
+    return sendText(res, 200, fs.readFileSync(BOOKMARKLET_PATH, 'utf8'), 'application/javascript; charset=utf-8');
   }
 
   if (req.url !== '/reporting' || !['POST', 'PUT', 'PATCH'].includes(req.method)) {

@@ -1,24 +1,24 @@
 # SMZS Obsidian Reporter
 
-Receive data-reporting webhooks from the 社媒助手 browser extension and save them as Obsidian Markdown notes.
+Save social media posts into Obsidian from a browser bookmarklet, 社媒助手 data-reporting webhooks, or social-media-copilot server responses.
 
 This is a small local bridge:
 
 ```text
-社媒助手 data reporting -> local HTTP endpoint -> Obsidian vault Markdown + raw JSON
+browser page / 社媒助手 / social-media-copilot -> local HTTP endpoint -> Obsidian Markdown + raw JSON
 ```
 
 It is not affiliated with 社媒助手 or Obsidian.
 
 ## Why
 
-社媒助手 can report collected data to a custom API endpoint. Obsidian is a local Markdown vault. This receiver connects the two: the extension posts JSON, and the receiver writes structured source notes into your vault.
+Obsidian is a local Markdown vault. This receiver provides a tiny local HTTP endpoint that can receive a social post payload and write a readable source note into your vault.
 
 ## Requirements
 
 - Node.js 18+
 - An Obsidian vault on your local machine
-- 社媒助手 extension with data reporting enabled
+- Optional: 社媒助手 extension or social-media-copilot server
 
 ## Quick Start
 
@@ -42,6 +42,24 @@ Health check:
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8787/health
 ```
+
+## Simplest Use: Bookmarklet
+
+After starting the reporter, open:
+
+```text
+http://127.0.0.1:8787/bookmarklet
+```
+
+Drag the `Save to Obsidian` button to your browser bookmarks bar.
+
+Then use it like this:
+
+1. Open a Xiaohongshu post page or another social media post page.
+2. Click the `Save to Obsidian` bookmark.
+3. The current page title, readable text, and images are saved into your Obsidian vault.
+
+This does not use the paid 社媒助手 data-reporting feature.
 
 ## 社媒助手 Configuration
 
