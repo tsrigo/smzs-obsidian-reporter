@@ -25,9 +25,9 @@ It is not affiliated with 社媒助手 or Obsidian.
 Clone and start:
 
 ```powershell
-git clone git@github.com:tsrigo/smzs-obsidian-reporter.git
+git clone https://github.com/<owner>/smzs-obsidian-reporter.git
 cd smzs-obsidian-reporter
-$env:VAULT_PATH="D:\Projects\myself-evolving"
+$env:VAULT_PATH="C:\path\to\your\obsidian-vault"
 node src/server.js
 ```
 
@@ -57,7 +57,7 @@ Optional token:
 
 ```powershell
 $env:REPORT_TOKEN="your-token"
-$env:VAULT_PATH="D:\Projects\myself-evolving"
+$env:VAULT_PATH="C:\path\to\your\obsidian-vault"
 node src/server.js
 ```
 
@@ -103,7 +103,7 @@ For 社媒助手 social posts, the note body is optimized for reading:
 Start the server in one terminal:
 
 ```powershell
-$env:VAULT_PATH="D:\Projects\myself-evolving"
+$env:VAULT_PATH="C:\path\to\your\obsidian-vault"
 node src/server.js
 ```
 
