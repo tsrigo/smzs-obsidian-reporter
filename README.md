@@ -96,7 +96,7 @@ For 社媒助手 social posts, the note body is optimized for reading:
 - `title` / `name` becomes the item heading.
 - `content` / `text` / `desc` becomes Markdown body text.
 - `note_cover` and `image_urls` are rendered as images.
-- Other fields are kept under a collapsible metadata block.
+- Other fields are kept only in the raw JSON file to keep the note readable.
 
 ## Test Locally
 

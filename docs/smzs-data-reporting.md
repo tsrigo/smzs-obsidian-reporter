@@ -58,7 +58,7 @@ The Markdown source note is post-processed for readability:
 - `title`, `name`, or `note_title` becomes the item heading.
 - `content`, `text`, `desc`, or `description` is rendered as readable Markdown text.
 - `note_cover`, `image_urls`, `image_url`, `images`, and similar fields are rendered as Markdown images.
-- Remaining fields are kept as metadata in a collapsible block.
+- Remaining fields are not rendered in the Markdown note. They remain available in the raw JSON file.
 
 ## CORS
 
