@@ -48,8 +48,17 @@ X-Report-Token: your-token
 The receiver stores this payload as:
 
 - Raw JSON: `Knowledge/Sources/Reports/Raw/`
-- Markdown source note: `Knowledge/Sources/Reports/`
+- Readable Markdown source note: `Knowledge/Sources/Reports/`
 - Inbox entry: `Knowledge/Inbox.md`
+
+## Rendering
+
+The Markdown source note is post-processed for readability:
+
+- `title`, `name`, or `note_title` becomes the item heading.
+- `content`, `text`, `desc`, or `description` is rendered as readable Markdown text.
+- `note_cover`, `image_urls`, `image_url`, `images`, and similar fields are rendered as Markdown images.
+- Remaining fields are kept as metadata in a collapsible block.
 
 ## CORS
 
@@ -62,4 +71,3 @@ Access-Control-Allow-Headers: Content-Type, X-Report-Token
 ```
 
 This is required because the extension sends requests from the browser context.
-

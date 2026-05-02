@@ -70,6 +70,209 @@ function inferTitle(payload) {
   );
 }
 
+function valueAtPath(object, dottedPath) {
+  if (!object || !dottedPath) return undefined;
+  return String(dottedPath).split('.').reduce((current, part) => {
+    if (current && Object.prototype.hasOwnProperty.call(current, part)) {
+      return current[part];
+    }
+    return undefined;
+  }, object);
+}
+
+function firstField(object, names) {
+  for (const name of names) {
+    const value = valueAtPath(object, name);
+    if (typeof value === 'string' && value.trim()) return value.trim();
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+  }
+  return '';
+}
+
+function formatContent(value) {
+  if (typeof value !== 'string') return '';
+  return value
+    .replace(/\r\n/g, '\n')
+    .replace(/\t/g, '')
+    .split('\n')
+    .map((line) => line.trimEnd())
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function splitUrls(value) {
+  if (!value) return [];
+  if (Array.isArray(value)) {
+    return value.flatMap(splitUrls);
+  }
+  if (typeof value !== 'string') return [];
+  return value
+    .split(/[\n,，\s]+/)
+    .map((url) => url.trim())
+    .filter((url) => /^https?:\/\//i.test(url));
+}
+
+function unique(values) {
+  return Array.from(new Set(values.filter(Boolean)));
+}
+
+function collectImageUrls(item) {
+  const directFields = [
+    'note_cover',
+    'cover',
+    'cover_url',
+    'image_url',
+    'image_urls',
+    'images',
+    'image',
+    'picture',
+    'pictures',
+  ];
+
+  const urls = [];
+  for (const field of directFields) {
+    urls.push(...splitUrls(valueAtPath(item, field)));
+  }
+
+  for (const [key, value] of Object.entries(item)) {
+    if (/image|img|cover|picture|photo/i.test(key)) {
+      urls.push(...splitUrls(value));
+    }
+  }
+
+  return unique(urls);
+}
+
+function formatTimestamp(value) {
+  if (!value) return '';
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    const ms = value > 100000000000 ? value : value * 1000;
+    const d = new Date(ms);
+    if (!Number.isNaN(d.getTime())) return d.toISOString().replace('T', ' ').slice(0, 19);
+  }
+  if (typeof value === 'string') return value;
+  return '';
+}
+
+function escapeTableCell(value) {
+  return String(value)
+    .replace(/\|/g, '\\|')
+    .replace(/\r?\n/g, '<br>');
+}
+
+function metadataForItem(item) {
+  const hidden = new Set([
+    'title',
+    'name',
+    'content',
+    'text',
+    'desc',
+    'description',
+    'note_cover',
+    'cover',
+    'cover_url',
+    'image_url',
+    'image_urls',
+    'images',
+    'image',
+    'picture',
+    'pictures',
+  ]);
+
+  const rows = Object.entries(item)
+    .filter(([key]) => !hidden.has(key))
+    .map(([key, value]) => {
+      const displayValue = typeof value === 'object'
+        ? JSON.stringify(value)
+        : String(value);
+      return `| ${escapeTableCell(key)} | ${escapeTableCell(displayValue)} |`;
+    });
+
+  if (rows.length === 0) return '无';
+  return ['| 字段 | 值 |', '| --- | --- |', ...rows].join('\n');
+}
+
+function renderItem(item, index) {
+  const title = firstField(item, ['title', 'name', 'note_title']) || `条目 ${index + 1}`;
+  const url = firstField(item, ['url', 'link', 'note_url']);
+  const content = formatContent(firstField(item, ['content', 'text', 'desc', 'description', 'note_content']));
+  const publishedAt = formatTimestamp(firstField(item, ['create_time', 'created_at', 'publish_time', 'time']));
+  const imageUrls = collectImageUrls(item);
+  const metadata = metadataForItem(item);
+
+  const lines = [];
+  lines.push(`## ${title}`);
+  lines.push('');
+  if (url) lines.push(`- 原始链接：${url}`);
+  if (publishedAt) lines.push(`- 发布时间：${publishedAt}`);
+  if (url || publishedAt) lines.push('');
+
+  if (content) {
+    lines.push('### 内容');
+    lines.push('');
+    lines.push(content);
+    lines.push('');
+  }
+
+  if (imageUrls.length > 0) {
+    lines.push('### 图片');
+    lines.push('');
+    imageUrls.forEach((imageUrl, imageIndex) => {
+      lines.push(`![图片 ${imageIndex + 1}](${imageUrl})`);
+      lines.push('');
+    });
+  }
+
+  lines.push('<details>');
+  lines.push('<summary>元数据</summary>');
+  lines.push('');
+  lines.push(metadata);
+  lines.push('');
+  lines.push('</details>');
+  lines.push('');
+
+  return lines.join('\n');
+}
+
+function renderReportBody(list, meta, extra) {
+  const lines = [];
+
+  if (list.length > 0) {
+    lines.push('# 上报内容');
+    lines.push('');
+    list.forEach((item, index) => {
+      lines.push(renderItem(asObject(item), index));
+    });
+  } else {
+    lines.push('# 上报内容');
+    lines.push('');
+    lines.push('本次上报没有 `list` 数据。');
+    lines.push('');
+  }
+
+  lines.push('## Extra');
+  lines.push('');
+  lines.push('```json');
+  lines.push(JSON.stringify(extra, null, 2));
+  lines.push('```');
+  lines.push('');
+
+  if (meta.length > 0) {
+    lines.push('<details>');
+    lines.push('<summary>字段说明</summary>');
+    lines.push('');
+    lines.push('```json');
+    lines.push(JSON.stringify(meta, null, 2));
+    lines.push('```');
+    lines.push('');
+    lines.push('</details>');
+    lines.push('');
+  }
+
+  return lines.join('\n');
+}
+
 function ensureVaultLayout() {
   fs.mkdirSync(RAW_DIR, { recursive: true });
 
@@ -117,11 +320,10 @@ function writeReport(payload) {
   const extra = asObject(payload.extra);
   const remark = typeof payload.remark === 'string' ? payload.remark : '';
   const version = typeof payload.version === 'string' ? payload.version : '';
-  const preview = list.slice(0, 5);
 
   fs.writeFileSync(rawPath, JSON.stringify(payload, null, 2), 'utf8');
 
-  const note = `---\ntitle: ${yamlString(title)}\ntype: source\nsource_type: report\ncreated: ${date}\nupdated: ${date}\nreport_time: ${yamlString(`${date} ${time}`)}\nversion: ${yamlString(version)}\ntags:\n  - source\n  - report\n  - data-reporting\n---\n\n# ${title}\n\n> 来源说明：本文件由本地数据上报接收器自动生成。原始 JSON 保存于 [[Raw/${rawFile}|${rawFile}]]。\n\n## 概览\n\n- 上报时间：${date} ${time}\n- 插件版本：${version || '未提供'}\n- 数据条数：${list.length}\n- 元数据字段数：${meta.length}\n- 备注：${remark || '无'}\n\n## Extra\n\n\`\`\`json\n${JSON.stringify(extra, null, 2)}\n\`\`\`\n\n## Meta\n\n\`\`\`json\n${JSON.stringify(meta, null, 2)}\n\`\`\`\n\n## 数据预览\n\n> 这里只显示前 ${preview.length} 条；完整数据见原始 JSON。\n\n\`\`\`json\n${JSON.stringify(preview, null, 2)}\n\`\`\`\n\n## 后续处理\n\n- [ ] 判断这批数据是否需要整理为 source / insight。\n- [ ] 如果包含长期可复用结论，沉淀到 [[Knowledge/Insights/README|Knowledge / Insights]]。\n`;
+  const note = `---\ntitle: ${yamlString(title)}\ntype: source\nsource_type: report\ncreated: ${date}\nupdated: ${date}\nreport_time: ${yamlString(`${date} ${time}`)}\nversion: ${yamlString(version)}\ntags:\n  - source\n  - report\n  - data-reporting\n---\n\n# ${title}\n\n> 来源说明：本文件由本地数据上报接收器自动生成。原始 JSON 保存于 [[Raw/${rawFile}|${rawFile}]]。\n\n## 概览\n\n- 上报时间：${date} ${time}\n- 插件版本：${version || '未提供'}\n- 数据条数：${list.length}\n- 元数据字段数：${meta.length}\n- 备注：${remark || '无'}\n\n${renderReportBody(list, meta, extra)}\n## 后续处理\n\n- [ ] 判断这批数据是否需要整理为 source / insight。\n- [ ] 如果包含长期可复用结论，沉淀到 [[Knowledge/Insights/README|Knowledge / Insights]]。\n`;
   fs.writeFileSync(notePath, note, 'utf8');
 
   appendIfMissing(
@@ -229,4 +431,3 @@ server.listen(PORT, HOST, () => {
     console.log('REPORT_TOKEN is not set. Requests can post without authentication.');
   }
 });
-

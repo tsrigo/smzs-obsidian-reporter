@@ -88,8 +88,15 @@ Knowledge/
 Each report gets:
 
 - A raw JSON file for complete provenance.
-- A Markdown source note with metadata and a preview of the first five items.
+- A readable Markdown source note that renders common fields such as `title`, `content`, `note_cover`, and `image_urls`.
 - A pending entry in `Knowledge/Inbox.md` for later processing.
+
+For 社媒助手 social posts, the note body is optimized for reading:
+
+- `title` / `name` becomes the item heading.
+- `content` / `text` / `desc` becomes Markdown body text.
+- `note_cover` and `image_urls` are rendered as images.
+- Other fields are kept under a collapsible metadata block.
 
 ## Test Locally
 
@@ -125,4 +132,3 @@ node examples/send-sample-report.js
 ## License
 
 MIT
-
