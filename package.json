@@ -1,0 +1,30 @@
+{
+  "name": "smzs-obsidian-reporter",
+  "version": "0.1.0",
+  "description": "Receive 社媒助手 data-reporting webhooks and save them as Obsidian Markdown notes.",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "bin": {
+    "smzs-obsidian-reporter": "src/server.js"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "check": "node --check src/server.js",
+    "test:sample": "node examples/send-sample-report.js"
+  },
+  "keywords": [
+    "obsidian",
+    "smzs",
+    "data-reporting",
+    "webhook",
+    "markdown",
+    "xiaohongshu",
+    "bilibili",
+    "douyin"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
+

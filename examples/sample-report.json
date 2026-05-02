@@ -1,0 +1,30 @@
+{
+  "extra": {
+    "title": "社媒助手数据上报示例",
+    "source": "sample"
+  },
+  "meta": [
+    {
+      "key": "title",
+      "name": "标题",
+      "alias": "",
+      "description": "采集条目的标题"
+    },
+    {
+      "key": "url",
+      "name": "链接",
+      "alias": "",
+      "description": "采集条目的原始链接"
+    }
+  ],
+  "list": [
+    {
+      "title": "测试条目",
+      "url": "https://example.com",
+      "note": "这是一条示例数据"
+    }
+  ],
+  "remark": "本地连通性测试",
+  "version": "sample"
+}
+
