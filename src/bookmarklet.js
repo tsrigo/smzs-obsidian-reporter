@@ -57,6 +57,7 @@
       if (!url) return;
       const normalized = String(url).trim();
       if (!/^https?:\/\//i.test(normalized)) return;
+      if (/avatar|user[-_]?icon|profile|head[-_]?image|emoji|icon|logo/i.test(normalized)) return;
       if (urls.includes(normalized)) return;
       urls.push(normalized);
     };
@@ -69,7 +70,13 @@
       const width = img.naturalWidth || img.width || 0;
       const height = img.naturalHeight || img.height || 0;
       if (width && height && (width < 180 || height < 120)) continue;
-      if (/avatar|icon|emoji|logo/i.test(img.className || '')) continue;
+      const imageContext = [
+        img.className || '',
+        img.alt || '',
+        img.getAttribute('aria-label') || '',
+        img.closest('[class]') && img.closest('[class]').className || '',
+      ].join(' ');
+      if (/avatar|user[-_]?icon|profile|head[-_]?image|emoji|icon|logo/i.test(imageContext)) continue;
       add(url);
     }
 
@@ -130,4 +137,3 @@
     alert(`Failed to save to Obsidian.\n\nMake sure the local reporter is running.\n\n${error.message || error}`);
   }
 }());
-

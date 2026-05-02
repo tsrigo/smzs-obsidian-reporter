@@ -42,6 +42,8 @@ The bookmarklet tries to extract:
 - Open Graph image
 - visible large images on the page
 
+It filters obvious non-content images such as avatar, icon, emoji, logo, and profile images.
+
 The extraction is intentionally generic. It is less precise than platform-specific APIs, but much faster to use.
 
 ## Limitations
@@ -50,4 +52,3 @@ The extraction is intentionally generic. It is less precise than platform-specif
 - Some platforms hide content behind dynamic components.
 - If extraction is poor, use 社媒助手 data reporting or social-media-copilot server mode instead.
 - If `REPORT_TOKEN` is enabled, bookmarklet mode needs additional customization because the bookmarklet does not store a token by default.
-
