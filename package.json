@@ -10,7 +10,8 @@
   "scripts": {
     "start": "node src/server.js",
     "check": "node --check src/server.js",
-    "test:sample": "node examples/send-sample-report.js"
+    "test:sample": "node examples/send-sample-report.js",
+    "adapt:copilot": "node examples/social-media-copilot-to-report.js"
   },
   "keywords": [
     "obsidian",
@@ -20,11 +21,11 @@
     "markdown",
     "xiaohongshu",
     "bilibili",
-    "douyin"
+    "douyin",
+    "social-media-copilot"
   ],
   "license": "MIT",
   "engines": {
     "node": ">=18"
   }
 }
-

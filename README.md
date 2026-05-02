@@ -69,6 +69,18 @@ X-Report-Token: your-token
 
 More details: [docs/smzs-data-reporting.md](docs/smzs-data-reporting.md).
 
+## social-media-copilot Server Mode
+
+If you do not want to use the Chrome Web Store edition's paid data-reporting feature, run the open-source `social-media-copilot` server branch as a separate service and use the adapter script in this repository:
+
+```text
+social-media-copilot server -> adapter script -> smzs-obsidian-reporter -> Obsidian
+```
+
+This repository does not vendor `social-media-copilot` code. It only documents how to call its HTTP API and normalize the result into this reporter.
+
+See [docs/social-media-copilot-server.md](docs/social-media-copilot-server.md).
+
 ## Output
 
 The receiver creates:
