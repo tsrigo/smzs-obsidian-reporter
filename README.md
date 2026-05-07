@@ -27,8 +27,15 @@ Clone and start:
 ```powershell
 git clone https://github.com/<owner>/smzs-obsidian-reporter.git
 cd smzs-obsidian-reporter
-$env:VAULT_PATH="C:\path\to\your\obsidian-vault"
+$env:VAULT_PATH="D:\Projects\myself-evolving"
 node src/server.js
+```
+
+`VAULT_PATH` means the absolute path of your Obsidian vault root, not this reporter repository.
+If you normally open `D:\Projects\myself-evolving` in Obsidian and that folder contains `.obsidian`, then `VAULT_PATH` should be set to:
+
+```powershell
+$env:VAULT_PATH="D:\Projects\myself-evolving"
 ```
 
 The default endpoint is:
@@ -75,7 +82,7 @@ Optional token:
 
 ```powershell
 $env:REPORT_TOKEN="your-token"
-$env:VAULT_PATH="C:\path\to\your\obsidian-vault"
+$env:VAULT_PATH="D:\Projects\myself-evolving"
 node src/server.js
 ```
 
@@ -133,7 +140,7 @@ For 社媒助手 social posts, the note body is optimized for reading:
 Start the server in one terminal:
 
 ```powershell
-$env:VAULT_PATH="C:\path\to\your\obsidian-vault"
+$env:VAULT_PATH="D:\Projects\myself-evolving"
 node src/server.js
 ```
 
@@ -147,7 +154,7 @@ node examples/send-sample-report.js
 
 | Name | Default | Description |
 | --- | --- | --- |
-| `VAULT_PATH` | current working directory | Absolute path to your Obsidian vault |
+| `VAULT_PATH` | current working directory | Absolute path to your Obsidian vault root, for example `D:\Projects\myself-evolving` |
 | `HOST` | `127.0.0.1` | Bind host |
 | `PORT` | `8787` | Bind port |
 | `REPORT_TOKEN` | empty | Optional shared secret checked via `X-Report-Token` |
